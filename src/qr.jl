@@ -3,30 +3,32 @@
 ###
 
 mutable struct QRPivot
-	basis_matrix::Matrix
+	Ψ::AbstractArray #Basis matrix from SVD, RPCA, etc.
 	pivots::AbstractArray #Ranked list of sensor locations
-	fit::Function
 end
 
-function QRPivot(Ψ::Matrix,pivots)
+function QRPivot(Ψ)
+	pivots = zeros(max(size(Ψ)))
 	return QRPivot(Ψ,pivots)
 end
 
-function fit(Ψ::Matrix;optimizer_kwargs...)
+function QRPivot(Ψ,pivots::AbstractArray)
+	return QRPivot(Ψ,pivots)
+end
+
+function fit(qrpivot::QRPivot;optimizer_kwargs...)
 	"""
 	Fits the QRPivot sensor placement.
-	Ψ: Matrix
-		Basis matrix
+	qrpivot::QRPivot
+		QRPivot object.
 	optimizer_kwargs: dictionary
 		Optional settings for optimizer
 	"""
-	pivots = sensor_placement(Ψ)
-	res = QRPivot(Ψ,pivots)
-	return res
+	qr_pivot.pivots = sensor_placement(qr_pivot.Ψ)
 end
 
-function get_sensors(sparse_sampler::QRPivot)
-	return sprase_sampler.pivots
+function get_sensors(sparse_sampler)
+	return sparse_sampler.pivots
 end
 
 function sensor_placement(Ψ)
