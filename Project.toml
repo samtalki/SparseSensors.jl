@@ -1,0 +1,13 @@
+name = "SparseSensors"
+uuid = "d6ceb477-1fb8-47dc-9268-a5d33dbc737e"
+authors = ["samtalki <saimouer@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
