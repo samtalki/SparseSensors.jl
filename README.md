@@ -61,7 +61,7 @@
    ## Todo:
    
    - Implement high level SSPOR and SSPOC interfaces
-   - Implement high level basis representation wrapper 
+   - Implement high level basis representation wrapper for SVD, etc.
    - Set up compatibility with JuliaML/MLJ.jl/ScikitLearn.jl
    
    References
