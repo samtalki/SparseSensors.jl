@@ -56,7 +56,7 @@
        Guide.xlabel("x"),Guide.ylabel("y"))
    ```
    
-   ![](/home/sam/github/SparseSensors/example.svg)
+   ![](example.svg)
    
    ## Todo:
    
