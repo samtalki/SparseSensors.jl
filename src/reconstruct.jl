@@ -15,18 +15,18 @@ struct Reconstructor
     predict::Function
 end
 
-function fit(model::SSPOR;quiet=true)
-    if model.fit_ === fit_lsq
-        model.fit_()
-    end
-end
+# function fit(model::SSPOR;quiet=true)
+#     if model.fit_ === fit_lsq
+#         model.fit_()
+#     end
+# end
 
-function predict(model::SSPOR,x::Vector;quiet=true)
-    if model.predict_ === predict_lsq
-        model.predict_(model.Ψ,x,model.n_basis_modes)
-    end
+# function predict(model::SSPOR,x::Vector;quiet=true)
+#     if model.predict_ === predict_lsq
+#         model.predict_(model.Ψ,x,model.n_basis_modes)
+#     end
 
-end
+# end
 
 function fit_lsq(Ψ,x,y,selected_sensors)
     y_sensed = y[selected_sensors];
