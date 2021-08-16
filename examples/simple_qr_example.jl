@@ -39,7 +39,8 @@ df[!,"y_sensed"] = y_sensed;
 p1 = plot(df,
     layer(x=:x_sensed,y=:y_sensed,color=["Optimized Sensors"]),
     layer(df_true,x=:x_true,y=:y_true,Geom.line,Geom.point,color=["True Function"]),
-    Guide.xlabel("x"),Guide.ylabel("y"))
+    Guide.xlabel("x"),Guide.ylabel("y"),
+    Theme(background_color=colorant"white"))
 
 #Save image
-draw(SVG("example.svg",3.5inch,2.163inch),p1)
+draw(SVG("example.svg",7inch,3.326inch),p1)
