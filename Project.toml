@@ -1,7 +1,7 @@
 name = "SparseSensors"
 uuid = "d6ceb477-1fb8-47dc-9268-a5d33dbc737e"
 authors = ["samtalki <saimouer@gmail.com> and contributors"]
-version = "0.1.0"
+version = "0.0.1"
 
 [deps]
 Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
