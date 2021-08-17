@@ -5,9 +5,12 @@
    All collaborations and contributions are welcome.
    
    
-   ## Dependencies
    
-   LinearAlgebra, example provided uses Gadfly and DataFrames for plotting.
+   ## Installation
+   To install, use Pkg. From the Julia REPL, press ] to enter Pkg-mode and run
+   ```julia
+   add SparseSensors
+   ```
    
    ## Example
    
@@ -57,6 +60,12 @@
    ```
    
    ![](example.svg)
+   
+   
+   ## Dependencies
+   
+   julia >v1.6.
+   LinearAlgebra, Gadfly and DataFrames for plotting.
    
    ## Todo:
    
