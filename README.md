@@ -9,7 +9,7 @@
    ## Installation
    To install, use Pkg. From the Julia REPL, press ] to enter Pkg-mode and run
    ```julia
-   add SparseSensors
+   pkg> add SparseSensors
    ```
    
    ## Example
