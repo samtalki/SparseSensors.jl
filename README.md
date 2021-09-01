@@ -1,6 +1,6 @@
 # SparseSensors.jl
    
-   This repository is an implementation of the core sparse sensor placement with QR factorization and cost-constrained QR factorization algorithms from Manohar, _et al.,_ "Data-Driven Sparse Sensor Placcement for Reconstruction" in Julia. This is a hobbyist attempt to provide a faithful implementation of the fantastic [pysensors](https://github.com/dynamicslab/pysensors) library in Julia. 
+   This repository is an implementation of the core sparse sensor placement with QR factorization and cost-constrained QR factorization algorithms from Manohar, _et al.,_ "Data-Driven Sparse Sensor Placcement for Reconstruction", and other papers, in Julia. This is a hobbyist port of the fantastic Python library [pysensors](https://github.com/dynamicslab/pysensors) in Julia. 
    
    All collaborations and contributions are welcome.
    
