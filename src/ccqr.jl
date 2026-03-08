@@ -13,7 +13,7 @@ Sensors with high cost are pushed later in the pivot ordering.
 
 See also: [`QRPivot`](@ref), [`fit`](@ref)
 """
-mutable struct CostQRPivot
+mutable struct CostQRPivot <: AbstractSampler
     Ψ::AbstractArray
     pivots::Vector{Int}
     sensor_costs::AbstractVector

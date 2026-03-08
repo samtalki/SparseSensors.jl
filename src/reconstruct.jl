@@ -29,15 +29,15 @@ function reconstruct(basis::Basis, sensor_indices::AbstractVector{Int}, measurem
 end
 
 """
-    reconstruct(sampler, basis::Basis, measurements::AbstractVector)
+    reconstruct(sampler::AbstractSampler, basis::Basis, measurements::AbstractVector)
 
-Convenience method that extracts sensor indices from `sampler.pivots` (a fitted
-[`QRPivot`](@ref) or [`CostQRPivot`](@ref)) and reconstructs the full state.
+Convenience method that extracts sensor indices from a fitted [`AbstractSampler`](@ref)
+and reconstructs the full state.
 
 The number of sensors used is determined by `length(measurements)`, so
 overdetermined reconstruction (more sensors than basis modes) is supported.
 """
-function reconstruct(sampler, basis::Basis, measurements::AbstractVector)
+function reconstruct(sampler::AbstractSampler, basis::Basis, measurements::AbstractVector)
     n_sensors = length(measurements)
     if length(sampler.pivots) < n_sensors
         throw(ArgumentError(

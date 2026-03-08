@@ -1,19 +1,31 @@
 module SparseSensors
 using LinearAlgebra
+
+"""
+    AbstractSampler
+
+Abstract supertype for all sensor placement samplers.
+
+Concrete subtypes ([`QRPivot`](@ref), [`CostQRPivot`](@ref)) must provide a
+`pivots::Vector{Int}` field and a [`fit`](@ref) method.
+"""
+abstract type AbstractSampler end
+
 include("qr.jl")
 include("ccqr.jl")
 include("basis.jl")
 include("reconstruct.jl")
 
+export AbstractSampler
 export QRPivot, CostQRPivot, fit, VandermondeBasis, SVDBasis, Basis
 export get_sensors, reconstruct
 
 """
-    get_sensors(sampler) -> Vector{Int}
+    get_sensors(sampler::AbstractSampler) -> Vector{Int}
 
-Return all ranked sensor locations from a fitted [`QRPivot`](@ref) or [`CostQRPivot`](@ref).
+Return all ranked sensor locations from a fitted [`AbstractSampler`](@ref).
 """
-function get_sensors(sampler)
+function get_sensors(sampler::AbstractSampler)
     return sampler.pivots
 end
 
@@ -27,11 +39,11 @@ function get_sensors(pivots::AbstractArray, n_sensors::Int)
 end
 
 """
-    get_sensors(sampler, n_sensors) -> Vector{Int}
+    get_sensors(sampler::AbstractSampler, n_sensors) -> Vector{Int}
 
-Return the top `n_sensors` locations from a fitted sampler.
+Return the top `n_sensors` locations from a fitted [`AbstractSampler`](@ref).
 """
-function get_sensors(sampler, n_sensors)
+function get_sensors(sampler::AbstractSampler, n_sensors)
     return get_sensors(sampler.pivots, n_sensors)
 end
 end

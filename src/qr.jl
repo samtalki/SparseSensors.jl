@@ -7,7 +7,7 @@ Optimal sensor placement via QR factorization with column pivoting.
 - `Ψ::AbstractArray`: Basis matrix (typically modes × sensors)
 - `pivots::Vector{Int}`: Ranked sensor locations (populated by [`fit`](@ref))
 """
-mutable struct QRPivot
+mutable struct QRPivot <: AbstractSampler
 	Ψ::AbstractArray
 	pivots::Vector{Int}
 end

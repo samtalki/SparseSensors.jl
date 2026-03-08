@@ -1,6 +1,7 @@
 using SparseSensors
 using LinearAlgebra
 using Test
+using Random
 
 @testset "SparseSensors.jl" begin
 
@@ -15,6 +16,7 @@ using Test
     end
 
     @testset "SVDBasis" begin
+        Random.seed!(42)
         n, m, r = 50, 30, 5
         # Build a rank-r matrix so the first r singular vectors are well-defined
         A = randn(n, r)
@@ -134,6 +136,7 @@ using Test
     end
 
     @testset "SVDBasis + reconstruct" begin
+        Random.seed!(42)
         # Build synthetic data from known modes, place sensors, reconstruct
         n = 100
         t = range(0, 2π, length=n)
