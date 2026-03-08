@@ -2,6 +2,9 @@
 
 Data-driven sparse sensor placement for reconstruction, based on
 [Manohar et al. (2018)](https://doi.org/10.1109/MCS.2018.2810460).
+This package provides a Julia implementation inspired by
+[pysensors](https://github.com/dynamicslab/pysensors)
+([de Silva et al., 2021](https://doi.org/10.21105/joss.02828)).
 
 ## Overview
 

@@ -34,9 +34,11 @@ end
 Convenience method that extracts sensor indices from `sampler.pivots` (a fitted
 [`QRPivot`](@ref) or [`CostQRPivot`](@ref)) and reconstructs the full state.
 
-The number of sensors used equals the number of basis modes (`basis.r`).
+The number of sensors used is determined by `length(measurements)`, so
+overdetermined reconstruction (more sensors than basis modes) is supported.
 """
 function reconstruct(sampler, basis::Basis, measurements::AbstractVector)
-    sensor_indices = sampler.pivots[1:basis.r]
+    n_sensors = length(measurements)
+    sensor_indices = sampler.pivots[1:n_sensors]
     return reconstruct(basis, sensor_indices, measurements)
 end

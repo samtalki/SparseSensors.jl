@@ -73,7 +73,7 @@ using Test
         Ψ = copy(transpose(basis.Ψ))
         n_sensors = size(Ψ, 2)
 
-        # Uniform costs → valid permutation
+        # Uniform zero costs → same result as unconstrained QRPivot
         costs = zeros(n_sensors)
         qr_pivot = QRPivot(Ψ)
         fit(qr_pivot)
@@ -81,6 +81,7 @@ using Test
         fit(ccqr)
         @test length(ccqr.pivots) == n_sensors
         @test sort(ccqr.pivots) == collect(1:n_sensors)
+        @test ccqr.pivots == qr_pivot.pivots
 
         # High cost on sensor 1 pushes it out of first pivot
         costs_high = zeros(n_sensors)

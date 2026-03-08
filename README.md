@@ -64,4 +64,5 @@ x̂ = reconstruct(basis, sensors, y)
 - de Silva, Brian M., Krithika Manohar, Emily Clark, Bingni W. Brunton,
   Steven L. Brunton, J. Nathan Kutz.
   "PySensors: A Python package for sparse sensor placement."
-  arXiv preprint arXiv:2102.13476 (2021). [arXiv](https://arxiv.org/abs/2102.13476)
+  Journal of Open Source Software 6, no. 58 (2021): 2828.
+  [DOI](https://doi.org/10.21105/joss.02828)
