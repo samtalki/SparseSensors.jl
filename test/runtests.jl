@@ -90,6 +90,14 @@ using Test
         fit(ccqr2)
         @test ccqr2.pivots[1] != 1
 
+        # Making one sensor cheap (all others expensive) forces it to be selected first
+        costs_cheap = fill(1e10, n_sensors)
+        cheap_idx = 50
+        costs_cheap[cheap_idx] = 0.0
+        ccqr3 = CostQRPivot(Ψ, Int[], costs_cheap)
+        fit(ccqr3)
+        @test ccqr3.pivots[1] == cheap_idx
+
         # Wrong-length costs throws DomainError
         @test_throws DomainError fit(CostQRPivot(Ψ, Int[], zeros(3)))
     end
@@ -119,6 +127,10 @@ using Test
         # Reconstruct via sampler convenience method
         x̂2 = reconstruct(qr_pivot, basis, measurements)
         @test x̂2 ≈ f_true atol=1e-8
+
+        # Unfitted sampler throws ArgumentError
+        unfitted = QRPivot(Ψ_T)
+        @test_throws ArgumentError reconstruct(unfitted, basis, measurements)
     end
 
     @testset "SVDBasis + reconstruct" begin

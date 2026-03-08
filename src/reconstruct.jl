@@ -39,6 +39,11 @@ overdetermined reconstruction (more sensors than basis modes) is supported.
 """
 function reconstruct(sampler, basis::Basis, measurements::AbstractVector)
     n_sensors = length(measurements)
+    if length(sampler.pivots) < n_sensors
+        throw(ArgumentError(
+            "sampler has $(length(sampler.pivots)) pivots but $n_sensors measurements were provided; " *
+            "call fit(sampler) before reconstruct"))
+    end
     sensor_indices = sampler.pivots[1:n_sensors]
     return reconstruct(basis, sensor_indices, measurements)
 end
