@@ -1,43 +1,34 @@
-###
-# Standard QR Pivot Optimizer
-###
+"""
+    QRPivot(Ψ)
 
+Optimal sensor placement via QR factorization with column pivoting.
+
+# Fields
+- `Ψ::AbstractArray`: Basis matrix (typically modes × sensors)
+- `pivots::Vector{Int}`: Ranked sensor locations (populated by [`fit`](@ref))
+"""
 mutable struct QRPivot
-	Ψ::AbstractArray #Basis matrix from SVD, RPCA, etc.
-	pivots::AbstractArray #Ranked list of sensor locations
+	Ψ::AbstractArray
+	pivots::Vector{Int}
 end
 
 function QRPivot(Ψ)
-	n,m = size(Ψ)
-	pivots = zeros((max(n,m),1))
-	return QRPivot(Ψ,pivots)
+	return QRPivot(Ψ, Int[])
 end
 
-function QRPivot(Ψ,n_sensors::Int)
-	n,m = size(Ψ)
-	pivots = zeros((n_sensors,1))
-	return QRPivot(Ψ,pivots)
-end
+"""
+    fit(qr_pivot::QRPivot) -> QRPivot
 
-function QRPivot(Ψ,pivots::AbstractArray)
-	return QRPivot(Ψ,pivots)
-end
-
-function fit(qr_pivot::QRPivot;optimizer_kwargs...)
-	"""
-	Fits the QRPivot sensor placement.
-	qrpivot::QRPivot
-		QRPivot object.
-	optimizer_kwargs: dictionary
-		Optional settings for optimizer
-	"""
+Compute optimal sensor locations for the given [`QRPivot`](@ref) using column-pivoted QR
+factorization. The resulting pivot indices are stored in `qr_pivot.pivots`, ordered from
+most to least informative.
+"""
+function fit(qr_pivot::QRPivot)
 	qr_pivot.pivots = sensor_placement(qr_pivot.Ψ)
+	return qr_pivot
 end
 
 function sensor_placement(Ψ)
-	# --> Compute the QRPivot w/ column pivoting decomposition of Ψ.
-	_, _, p = qr(conj(Ψ), Val(true))
+	_, _, p = qr(conj(Ψ), ColumnNorm())
 	return p[1:size(Ψ, 2)]
 end
-
-
