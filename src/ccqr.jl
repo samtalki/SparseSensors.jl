@@ -1,64 +1,94 @@
-### 
-# Const-constrained QR optimizer for sensor placement.
-###
+"""
+    CostQRPivot(Ψ, pivots, sensor_costs)
 
-mutable struct CostQRPivot
+Cost-constrained QR sensor placement optimizer.
+
+Extends QR-pivoted sensor placement by penalizing expensive sensor locations.
+Sensors with high cost are pushed later in the pivot ordering.
+
+# Fields
+- `Ψ::AbstractArray`: Basis matrix (modes × sensors).
+- `pivots::Vector{Int}`: Ranked sensor locations (populated by [`fit`](@ref)).
+- `sensor_costs::AbstractVector`: Per-sensor cost vector (length must equal number of columns).
+
+See also: [`QRPivot`](@ref), [`fit`](@ref)
+"""
+mutable struct CostQRPivot <: AbstractSampler
     Ψ::AbstractArray
-    pivots::AbstractArray
-    sensor_costs::AbstractArray #Costs/weights associated with each sensor. Postsive is bad, negative good.
+    pivots::Vector{Int}
+    sensor_costs::AbstractVector
 end
 
-function CostQRPivot(qrpivot::QRPivot,sensor_costs::Vector{Float64})
-    return CostQRPivot(qrpivot.Ψ,qrpivot.pivots,sensor_costs)
+function CostQRPivot(qrpivot::QRPivot, sensor_costs::AbstractVector)
+    return CostQRPivot(qrpivot.Ψ, Int[], sensor_costs)
 end
 
-function CostQRPivot(Ψ::AbstractArray,pivots::Vector,sensor_costs::Vector{Float64})
-    return CostQRPivot(Ψ,pivots,sensor_costs)
-end
+"""
+    fit(cost_qr_pivot::CostQRPivot) -> CostQRPivot
 
+Compute cost-constrained sensor locations. Works like [`fit(::QRPivot)`](@ref) but
+subtracts `sensor_costs` from column norms at each pivot step, preferring cheaper sensors
+when information content is similar.
+
+Throws `DomainError` if the length of `sensor_costs` does not match the number of columns.
+"""
 function fit(cost_qr_pivot::CostQRPivot)
-    n,m = size(cost_qr_pivot.Ψ)
+    n, m = size(cost_qr_pivot.Ψ)
 
-    if cost_qr_pivot.sensor_costs !== n
-        throw(DomainError(cost_qr_pivot.sensor_costs,"The specified sensor costs are inconsistent with the basis dimensions"))
+    if length(cost_qr_pivot.sensor_costs) != m
+        throw(DomainError(cost_qr_pivot.sensor_costs, "Sensor costs length must match number of columns (sensors)"))
     end
-    #Initialize helper variables
-    R,p,k = make_helper_variables(cost_qr_pivot.Ψ)
+
+    R, p, k = make_helper_variables(cost_qr_pivot.Ψ)
 
     for j in 1:k
-        u,i_piv = qr_reflector(R[j:n,j:m],cost_qr_pivot.sensor_costs)
-        #Track column pivots
-        i_piv += j 
-        p[[j,i_piv]] = p[[i_piv,j]]
-        #Switch column
-        R[:,[j,i_piv]] = R[:,[i_piv,j]] 
-        #Apply reflector
-        R[j:n,j:m] -= outer(u,dot(u,R[j:n,j:m]))
-        R[j+1:n,j] = 0
+        Rsub = @view R[j:n, j:m]
+        u, i_piv = qr_reflector(Rsub, cost_qr_pivot.sensor_costs[p[j:m]])
+        i_piv += j - 1
+        p[[j, i_piv]] = p[[i_piv, j]]
+        R[:, [j, i_piv]] = R[:, [i_piv, j]]
+        Rsub .-= u * (u' * Rsub)
+        R[j+1:n, j] .= 0
     end
     cost_qr_pivot.pivots = p
+    return cost_qr_pivot
 end
 
+"""
+    make_helper_variables(Ψ) -> (R, p, k)
+
+Initialize working variables for cost-constrained QR factorization.
+
+Returns the conjugate copy `R`, the identity permutation `p`, and the pivot count `k`.
+"""
 function make_helper_variables(Ψ)
-    """Constructs the reflector helper variables"""
-    R = conj(Ψ)
-    p = [i for i in 1:n]
-    k = min(m,n)
-    return R,p,k
+    R = float.(conj(Ψ))
+    n, m = size(Ψ)
+    p = collect(1:m)
+    k = min(m, n)
+    return R, p, k
 end
 
-function qr_reflector(r,costs)
-    dlens = sqrt(sum(abs(eachrow(r))^2)) #Norm of each column
-    i_piv = argmax(dlens-costs) # choose pivot
+"""
+    qr_reflector(r, costs) -> (u, i_piv)
+
+Compute a Householder reflector for cost-constrained column pivoting.
+
+Selects the pivot column that maximises `‖column‖ − cost`, then returns the
+Householder vector `u` and the pivot index `i_piv`.
+"""
+function qr_reflector(r, costs)
+    dlens = [norm(c) for c in eachcol(r)]
+    i_piv = argmax(dlens - costs)
     dlen = dlens[i_piv]
 
-    if dlen > 0 
-        u = r[:,i_piv]/dlen
-        u[1] += sign(u[1])+(u[1]==0)
-        u/=sqrt(abs(u[1]))
+    if dlen > 0
+        u = r[:, i_piv] / dlen
+        u[1] += sign(u[1]) + (u[1] == 0)
+        u /= sqrt(abs(u[1]))
     else
-        u = r[:,i_piv]
+        u = r[:, i_piv]
         u[1] = sqrt(2)
     end
-    return u,i_piv
+    return u, i_piv
 end
