@@ -44,6 +44,7 @@ VandermondeBasis
 ### Sensor Placement
 
 ```@docs
+AbstractSampler
 QRPivot
 CostQRPivot
 fit
