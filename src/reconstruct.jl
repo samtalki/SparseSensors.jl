@@ -1,45 +1,49 @@
-using Convex,SCS
+"""
+    reconstruct(basis::Basis, sensor_indices::AbstractVector{Int}, measurements::AbstractVector)
 
-mutable struct SSPOR
-    basis::Basis
-    selected_sensors::Vector
-    n_sensors::Int
-    n_basis_modes::Int
-    fit_::Function
-    predict_::Function
-    optimizer
+Reconstruct the full state from sparse sensor measurements.
+
+Solves the linear system `Ψ[sensor_indices, :] * a = measurements` for the
+mode coefficients `a`, then returns the full-field estimate `Ψ * a`.
+
+# Arguments
+- `basis::Basis`: The basis used for sensor placement.
+- `sensor_indices::AbstractVector{Int}`: Indices of the sensor locations.
+- `measurements::AbstractVector`: Measured values at those locations.
+
+# Returns
+- `Vector`: Reconstructed full-state vector of length `size(basis.Ψ, 1)`.
+
+# Examples
+```julia
+basis = VandermondeBasis(0.0:0.01:1.0, 5)
+sensors = [1, 26, 51, 76, 101]
+y = f.(x[sensors])          # measure at sensor locations
+x̂ = reconstruct(basis, sensors, y)
+```
+"""
+function reconstruct(basis::Basis, sensor_indices::AbstractVector{Int}, measurements::AbstractVector)
+    Θ = basis.Ψ[sensor_indices, :]
+    a = Θ \ measurements
+    return basis.Ψ * a
 end
 
-struct Reconstructor
-    fit::Function
-    predict::Function
+"""
+    reconstruct(sampler::AbstractSampler, basis::Basis, measurements::AbstractVector)
+
+Convenience method that extracts sensor indices from a fitted [`AbstractSampler`](@ref)
+and reconstructs the full state.
+
+The number of sensors used is determined by `length(measurements)`, so
+overdetermined reconstruction (more sensors than basis modes) is supported.
+"""
+function reconstruct(sampler::AbstractSampler, basis::Basis, measurements::AbstractVector)
+    n_sensors = length(measurements)
+    if length(sampler.pivots) < n_sensors
+        throw(ArgumentError(
+            "sampler has $(length(sampler.pivots)) pivots but $n_sensors measurements were provided; " *
+            "call fit(sampler) before reconstruct"))
+    end
+    sensor_indices = sampler.pivots[1:n_sensors]
+    return reconstruct(basis, sensor_indices, measurements)
 end
-
-# function fit(model::SSPOR;quiet=true)
-#     if model.fit_ === fit_lsq
-#         model.fit_()
-#     end
-# end
-
-# function predict(model::SSPOR,x::Vector;quiet=true)
-#     if model.predict_ === predict_lsq
-#         model.predict_(model.Ψ,x,model.n_basis_modes)
-#     end
-
-# end
-
-function fit_lsq(Ψ,x,y,selected_sensors)
-    y_sensed = y[selected_sensors];
-    x_sensed = x[selected_sensors];
-    Ψ_sensed = Ψ[:,selected_sensors]
-    return Ψ_sensed,x_sensed,y_sensed
-end
-
-function predict_lsq(Ψ,x,y,n_basis_modes)
-    X = Convex.Variable(size(x))    
-    prob = minimize(sumsquares(y-Ψ*X))
-    solve!(prob,()-> SCS.Optimizer(verbose=false))
-    prob.status
-    return prob.optval
-end
-
